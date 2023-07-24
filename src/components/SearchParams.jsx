@@ -1,4 +1,5 @@
 import {useState} from "react";
+import Results from "./Results.jsx";
 
 const animals = ['bird', 'cat', 'rabbit', 'reptile'];
 const breeds = [];
@@ -7,10 +8,23 @@ function SearchParams() {
     const [location, setLocation] = useState('');
     const [animal, setAnimal] = useState('');
     const [breed, setBreed] = useState('');
+    const [results, setResults] = useState([]);
+
+
+    async function fetchSearch() {
+        const response = await fetch(`http://pets-v2.dev-apis.com/pets?animal=${animal}&location=${location}&breed=${breed}`)
+        return response.json();
+    }
+
 
     return (
         <div className="search-params">
-            <form>
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    fetchSearch().then((data) => setResults(data.pets));
+                }}
+            >
                 <label htmlFor="location">Location </label>
                 <input
                     type="text"
@@ -20,7 +34,6 @@ function SearchParams() {
                     value= {location}
                     onChange={(e) => setLocation(e.target.value)}
                 />
-
 
                 <label htmlFor="animal">Animals</label>
                 <select
@@ -54,8 +67,11 @@ function SearchParams() {
                         </option>
                     ))}
                 </select>
-
+                <button
+                    type='submit'
+                >Submit</button>
             </form>
+            <Results pets={results}/>
         </div>
     );
 }
